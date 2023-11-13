@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Application.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -8,10 +9,12 @@ namespace Application.Services;
 public class CryptoServerService : ICryptoServerService
 {
     private readonly RSA _rsa;
+    private readonly ILogger<CryptoServerService> _logger;
 
-    public CryptoServerService(RSA rsa)
+    public CryptoServerService(RSA rsa, ILogger<CryptoServerService> logger)
     {
         _rsa = rsa;
+        _logger = logger;
     }
 
     public string Decrypt(DecryptRequest request)
@@ -26,15 +29,23 @@ public class CryptoServerService : ICryptoServerService
     public string GetPublicKey()
     {
         var publicKey = _rsa.ExportRSAPublicKey();
+        var base64PublicKey = Convert.ToBase64String(publicKey);
 
-        return Convert.ToBase64String(publicKey);
+        var publicKeyLogString =
+               "\n===============   Start   ===============\n" +
+               $"{base64PublicKey}" +
+               "\n===============    End    ===============\n";
+
+        _logger.LogInformation(publicKeyLogString);
+
+        return base64PublicKey;
     }
 
     private string DecryptText(string key, string iv, string encryptedText)
     {
-        var encryptedBytes = Convert.FromBase64String(encryptedText);
         var keyBytes = Encoding.UTF8.GetBytes(key);
         var ivBytes = Encoding.UTF8.GetBytes(iv);
+        var encryptedBytes = Convert.FromBase64String(encryptedText);
 
         var result = DecryptStringFromBytes_Aes(encryptedBytes, keyBytes, ivBytes);
 
@@ -43,7 +54,7 @@ public class CryptoServerService : ICryptoServerService
 
     private string DecryptKey(string key)
     {
-        var encryptedBytes = Convert.FromBase64String(key);
+        var encryptedBytes = Encoding.UTF8.GetBytes(key);
         var decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.Pkcs1);
         var decryptedKey = Encoding.UTF8.GetString(decryptedBytes);
 
@@ -54,17 +65,17 @@ public class CryptoServerService : ICryptoServerService
     {
         if (cipherText is null || cipherText.Length <= 0)
         {
-            throw new ArgumentNullException("cipherText");
+            throw new ArgumentNullException(nameof(cipherText));
         }
 
         if (Key is null || Key.Length <= 0)
         {
-            throw new ArgumentNullException("Key");
+            throw new ArgumentNullException(nameof(Key));
         }
 
         if (IV is null || IV.Length <= 0)
         {
-            throw new ArgumentNullException("IV");
+            throw new ArgumentNullException(nameof(IV));
         }
 
         using var aesAlg = Aes.Create();

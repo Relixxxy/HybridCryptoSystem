@@ -1,6 +1,27 @@
 ﻿@page "/crypto"
+@using Application.Services.Interfaces;
+@inject ICryptoClientService CryptoService
+
 <h3>Crypto</h3>
+<div class="row">
+    <div class="col-6">
+        <label class="form-label">Enter text to encrypt</label>
+        <input class="form-control mb-5" @bind="inputText" />
+
+        <button class="btn btn-primary" @onclick="OnButtonClick">Click me!</button>
+    </div>
+    <div class ="col-6">
+        Result: @result
+    </div>
+</div>
+
 
 @code {
+    private string inputText = string.Empty;
+    private string result = string.Empty;
 
+    private async Task OnButtonClick()
+    {
+        result = await CryptoService.EncryptDecryptAsync(inputText);
+    }
 }

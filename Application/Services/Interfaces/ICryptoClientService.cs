@@ -2,7 +2,5 @@
 
 public interface ICryptoClientService
 {
-    public string Encrypt(string text);
-
-    public string Decrypt(string text);
+    public Task<string> EncryptDecryptAsync(string text);
 }
