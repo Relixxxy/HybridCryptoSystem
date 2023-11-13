@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{843556E7-D39E-46CF-B753-970F088F5BE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL", "BLL\BLL.csproj", "{31853469-3355-4BF4-B3C2-8FF8A10AC722}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "BLL\Application.csproj", "{31853469-3355-4BF4-B3C2-8FF8A10AC722}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F362992E-ED4E-4C93-BE20-2D6F7ABD029D}"
 	ProjectSection(SolutionItems) = preProject
