@@ -19,9 +19,9 @@ public class CryptoServerService : ICryptoServerService
 
     public string Decrypt(DecryptRequest request)
     {
-        var key = DecryptKey(request.EncryptedKey);
-        var iv = DecryptKey(request.EncryptedIV);
-        var text = DecryptText(key, iv, request.EncryptedText);
+        var keyBytes = DecryptKeyToBytes(request.EncryptedKey);
+        var ivBytes = DecryptKeyToBytes(request.EncryptedIV);
+        var text = DecryptText(keyBytes, ivBytes, request.EncryptedText);
 
         return text;
     }
@@ -41,10 +41,8 @@ public class CryptoServerService : ICryptoServerService
         return base64PublicKey;
     }
 
-    private string DecryptText(string key, string iv, string encryptedText)
+    private string DecryptText(byte[] keyBytes, byte[] ivBytes, string encryptedText)
     {
-        var keyBytes = Encoding.UTF8.GetBytes(key);
-        var ivBytes = Encoding.UTF8.GetBytes(iv);
         var encryptedBytes = Convert.FromBase64String(encryptedText);
 
         var result = DecryptStringFromBytes_Aes(encryptedBytes, keyBytes, ivBytes);
@@ -52,13 +50,12 @@ public class CryptoServerService : ICryptoServerService
         return result;
     }
 
-    private string DecryptKey(string key)
+    private byte[] DecryptKeyToBytes(string key)
     {
-        var encryptedBytes = Encoding.UTF8.GetBytes(key);
+        var encryptedBytes = Convert.FromBase64String(key);
         var decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.Pkcs1);
-        var decryptedKey = Encoding.UTF8.GetString(decryptedBytes);
 
-        return decryptedKey;
+        return decryptedBytes;
     }
 
     private string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] Key, byte[] IV)

@@ -81,7 +81,7 @@ public class CryptoClientService : ICryptoClientService
     private string EncryptKey(byte[] keyBytes)
     {
         var encryptedBytes = _rsa.Encrypt(keyBytes, RSAEncryptionPadding.Pkcs1);
-        var encryptedKey = Encoding.UTF8.GetString(encryptedBytes);
+        var encryptedKey = Convert.ToBase64String(encryptedBytes);
 
         return encryptedKey;
     }
