@@ -12,7 +12,7 @@ builder.Services.AddHttpClient<ICryptoClientService, CryptoClientService>(
     {
         options.BaseAddress = new Uri("http://localhost:5001/api/crypto/");
     });
-builder.Services.AddScoped(_ => RSA.Create());
+builder.Services.AddScoped(_ => RSA.Create(1024));
 builder.Services.AddScoped(_ => Aes.Create());
 
 var app = builder.Build();

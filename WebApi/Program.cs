@@ -9,7 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ICryptoServerService, CryptoServerService>();
-builder.Services.AddSingleton(RSA.Create());
+builder.Services.AddSingleton(RSA.Create(1024));
 
 var app = builder.Build();
 
