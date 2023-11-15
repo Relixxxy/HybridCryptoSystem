@@ -2,6 +2,7 @@
 using Application.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Application.Services;
 
