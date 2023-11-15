@@ -10,19 +10,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ICryptoServerService, CryptoServerService>();
-builder.Services.AddSingleton(RSA.Create(1024));
-builder.Services.AddSingleton(serviceProvider =>
+builder.Services.AddScoped(serviceProvider =>
 {
-    var rsa = serviceProvider.GetRequiredService<RSA>();
-    var certificateRequest = new CertificateRequest("CN=PavlenkoVladyslav", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-    var certificate = certificateRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(1));
-
     var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
     store.Open(OpenFlags.ReadWrite);
-    store.Add(certificate);
+
+    var cert = store.Certificates.Find(X509FindType.FindBySubjectName, "PavlenkoVladyslav", false).FirstOrDefault();
+
+    if (cert is null)
+    {
+        cert = CreateCertificate("p@ssw0rd!");
+        
+        store.Add(cert);
+    }
+
     store.Close();
 
-    return certificate;
+    return cert;
 });
 
 var app = builder.Build();
@@ -40,3 +44,17 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+X509Certificate2 CreateCertificate(string password)
+{
+    var rsa = RSA.Create(1024);
+    var certificateRequest = new CertificateRequest("CN=PavlenkoVladyslav", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+    var certificate = certificateRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(1));
+
+    var certWithPassword = new X509Certificate2(
+            certificate.Export(X509ContentType.Pfx, password),
+            password,
+            X509KeyStorageFlags.PersistKeySet);
+
+    return certWithPassword;
+}

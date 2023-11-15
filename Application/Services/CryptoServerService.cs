@@ -8,13 +8,15 @@ namespace Application.Services;
 
 public class CryptoServerService : ICryptoServerService
 {
-    private readonly RSA _rsa;
+    private readonly RSA _rsaPrivate;
+    private readonly RSA _rsaPublic;
     private readonly ILogger<CryptoServerService> _logger;
 
-    public CryptoServerService(RSA rsa, ILogger<CryptoServerService> logger)
+    public CryptoServerService(X509Certificate2 certificate, ILogger<CryptoServerService> logger)
     {
-        _rsa = rsa;
         _logger = logger;
+        _rsaPrivate = certificate.GetRSAPrivateKey();
+        _rsaPublic = certificate.GetRSAPublicKey();
     }
 
     public string Decrypt(DecryptRequest request)
@@ -28,7 +30,7 @@ public class CryptoServerService : ICryptoServerService
 
     public string GetPublicKey()
     {
-        var publicKey = _rsa.ExportRSAPublicKey();
+        var publicKey = _rsaPublic.ExportRSAPublicKey();
         var base64PublicKey = Convert.ToBase64String(publicKey);
 
         var publicKeyLogString =
@@ -53,7 +55,7 @@ public class CryptoServerService : ICryptoServerService
     private byte[] DecryptKeyToBytes(string key)
     {
         var encryptedBytes = Convert.FromBase64String(key);
-        var decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.Pkcs1);
+        var decryptedBytes = _rsaPrivate.Decrypt(encryptedBytes, RSAEncryptionPadding.Pkcs1);
 
         return decryptedBytes;
     }
