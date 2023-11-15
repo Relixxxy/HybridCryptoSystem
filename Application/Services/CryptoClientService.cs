@@ -24,6 +24,8 @@ public class CryptoClientService : ICryptoClientService
         _aes = aes;
         _httpClient = httpClient;
         _logger = logger;
+
+        SetAesKeyByPassPhrase("Pavlenko");
     }
 
     public async Task<string> EncryptDecryptAsync(string text)
@@ -55,6 +57,19 @@ public class CryptoClientService : ICryptoClientService
         }
 
         return string.Empty;
+    }
+
+    private void SetAesKeyByPassPhrase(string passPhrase)
+    {
+        const int Iterations = 300;
+        const int KeySize = 32;
+
+        var salt = Enumerable.Range(0, 10).Select(_ => (byte) Random.Shared.Next(10, 100)).ToArray();
+        var keyGenerator = new Rfc2898DeriveBytes(passPhrase, salt, Iterations);
+
+        var key = keyGenerator.GetBytes(KeySize);
+
+        _aes.Key = key;
     }
 
     private async Task SetPublicKeyAsync()

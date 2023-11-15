@@ -2,7 +2,6 @@
 using Application.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace Application.Services;
 
