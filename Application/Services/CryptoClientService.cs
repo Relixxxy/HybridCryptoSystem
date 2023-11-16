@@ -62,12 +62,16 @@ public class CryptoClientService : ICryptoClientService
     private void SetAesKeyByPassPhrase(string passPhrase)
     {
         const int Iterations = 300;
-        const int KeySize = 32;
+        const int KeySize = 128;
+
+        _aes.KeySize = KeySize;
+        _aes.BlockSize = KeySize;
+        _aes.Mode = CipherMode.CBC;
 
         var salt = Enumerable.Range(0, 10).Select(_ => (byte) Random.Shared.Next(10, 100)).ToArray();
         var keyGenerator = new Rfc2898DeriveBytes(passPhrase, salt, Iterations);
 
-        var key = keyGenerator.GetBytes(KeySize);
+        var key = keyGenerator.GetBytes(KeySize / 8);
 
         _aes.Key = key;
     }

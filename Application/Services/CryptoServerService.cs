@@ -79,6 +79,9 @@ public class CryptoServerService : ICryptoServerService
 
         using var aesAlg = Aes.Create();
 
+        aesAlg.Mode = CipherMode.CBC;
+        aesAlg.KeySize = 128;
+        aesAlg.BlockSize = 128;
         aesAlg.Key = Key;
         aesAlg.IV = IV;
 
